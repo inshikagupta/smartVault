@@ -157,16 +157,3 @@ npm run dev
 | GET | `/public/:token` | Access a file via public share link (no auth) |
 
 ---
-
-## 🚧 Known Limitations / Roadmap
-
-- **Folders** — the frontend already has a `folder.service.js` calling `/api/folders`, but the backend `Folder` model and routes aren't implemented yet
-- **PDF/DOCX text extraction** — `pdf-parse` and `mammoth` are referenced in the AI service for extracting searchable text but aren't yet installed as dependencies
-- **Full-text search** — a MongoDB text index exists on the `File` model but search currently uses regex matching instead
-- File versioning schema exists (`versions[]`) but isn't populated yet — re-uploading a file with the same name currently overwrites the previous version instead of keeping history
-
----
-
-## 📄 License
-
-This project is for personal/educational use.
