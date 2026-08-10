@@ -14,10 +14,11 @@ const ALLOWED_TYPES = [
   "application/x-rar-compressed",
   "text/",
 ];
+const uploadDir = path.join(process.cwd(), "uploads");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
 
   filename: (req, file, cb) => {
