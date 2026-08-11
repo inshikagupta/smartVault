@@ -21,10 +21,18 @@ async function uploadFileToCloud(file) {
       uploadOptions.categorization = "aws_rek_tagging";
     }
 
-    const result = await cloudinary.uploader.upload(
-      file.path,
-      uploadOptions
-    );
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(result);
+      });
+
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
 
     return result;
 

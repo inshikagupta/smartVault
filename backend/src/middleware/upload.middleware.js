@@ -1,5 +1,4 @@
 const multer = require("multer");
-const path = require("path");
 
 const ALLOWED_TYPES = [
   "image/",
@@ -14,17 +13,7 @@ const ALLOWED_TYPES = [
   "application/x-rar-compressed",
   "text/",
 ];
-const uploadDir = path.join(process.cwd(), "uploads");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowed = ALLOWED_TYPES.some(

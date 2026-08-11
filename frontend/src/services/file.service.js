@@ -1,7 +1,18 @@
 import axios from "axios";
 
+const normalizeApiBaseUrl = (value) => {
+  if (!value) return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.endsWith("/api/files")) return trimmed;
+  if (trimmed.endsWith("/api")) return `${trimmed}/files`;
+  return `${trimmed}/api/files`;
+};
+
 const API = axios.create({
-  baseURL: "http://localhost:3000/api/files",
+  baseURL: normalizeApiBaseUrl(import.meta.env.VITE_API_URL) || (import.meta.env.PROD ? "/api/files" : "http://localhost:3000/api/files"),
   withCredentials: true,
 });
 
