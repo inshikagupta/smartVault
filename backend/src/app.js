@@ -19,12 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173")
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173,https://smart-vault-livid.vercel.app")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(cors({
+  const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -36,8 +36,9 @@ app.use(cors({
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 
