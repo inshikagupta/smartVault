@@ -12,8 +12,12 @@ async function uploadFile(req, res) {
   const file = req.file;
   try {
     if (!file) return res.status(400).json({ success: false, message: "No file uploaded" });
+
+    console.log("FILE:", req.file);
+
     const result = await uploadFileToCloud(file);
     let aiTags = [];
+
 
     if (file.mimetype.startsWith("image/")) {
       aiTags = result.tags || [];
