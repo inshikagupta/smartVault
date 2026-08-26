@@ -15,6 +15,7 @@ router.get("/shared", c.getSharedFiles);
 router.get("/search", c.searchFiles);
 router.get("/storage-stats", c.getStorageStats);
 router.get("/download/:id", c.downloadFile);
+router.get("/preview/:id", c.previewFile);
 router.put("/trash/:id", c.moveToTrash);
 router.put("/restore/:id", c.restoreFile);
 router.put("/rename/:id", c.renameFile);

@@ -7,7 +7,7 @@ import {
     getAllFiles, getStarredFiles, getTrashFiles, getSharedFiles,
     uploadFile, moveToTrash, deleteFilePermanently, restoreFile,
     toggleStar, renameFile, shareFile, getStorageStats, searchFiles,
-    downloadFile, generateShareLink
+    downloadFile, previewFile, generateShareLink
     } from "../services/file.service";
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -339,6 +339,25 @@ export default function Dashboard() {
         } catch (e) { showToast("Failed to download", "error"); }
     };
 
+    const handlePreview = async (file) => {
+        if (file.fileType !== "application/pdf") {
+            setPreviewModal(file);
+            return;
+        }
+
+        try {
+            const blob = await previewFile(file._id);
+            setPreviewModal({ ...file, previewUrl: URL.createObjectURL(blob) });
+        } catch (e) {
+            showToast("Failed to load preview", "error");
+        }
+    };
+
+    const closePreview = () => {
+        if (previewModal?.previewUrl) URL.revokeObjectURL(previewModal.previewUrl);
+        setPreviewModal(null);
+    };
+
 
 
     // ── Context Menu Items ─────────────────────────────────────────────────────
@@ -348,7 +367,7 @@ export default function Dashboard() {
             { icon: "🗑️", label: "Delete permanently", onClick: () => handlePermanentDelete(file), danger: true }
         ];
         return [
-            { icon: "👁️", label: "Preview", onClick: () => setPreviewModal(file) },
+            { icon: "👁️", label: "Preview", onClick: () => handlePreview(file) },
             { icon: "⬇️", label: "Download", onClick: () => handleDownload(file) },
             "divider",
             { icon: "✏️", label: "Rename", onClick: () => { setRenameModal(file); setRenameValue(file.fileName); } },
@@ -659,13 +678,13 @@ export default function Dashboard() {
             </Modal>
 
             {/* Preview Modal */}
-            <Modal open={!!previewModal} onClose={() => setPreviewModal(null)} title={previewModal?.fileName || ""} width={720}>
+            <Modal open={!!previewModal} onClose={closePreview} title={previewModal?.fileName || ""} width={720}>
                 {previewModal && (
                     <div style={{ textAlign: "center" }}>
                         {previewModal.fileType?.startsWith("image/") ? (
                             <img src={previewModal.fileUrl} alt={previewModal.fileName} style={{ maxWidth: "100%", maxHeight: "60vh", borderRadius: 8, objectFit: "contain" }} />
                         ) : previewModal.fileType === "application/pdf" ? (
-                            <iframe src={previewModal.fileUrl} style={{ width: "100%", height: "60vh", border: "none", borderRadius: 8 }} title="PDF Preview" />
+                            <iframe src={previewModal.previewUrl} style={{ width: "100%", height: "60vh", border: "none", borderRadius: 8 }} title="PDF Preview" />
                         ) : previewModal.fileType?.startsWith("video/") ? (
                             <video controls style={{ maxWidth: "100%", maxHeight: "60vh", borderRadius: 8 }}>
                                 <source src={previewModal.fileUrl} type={previewModal.fileType} />
