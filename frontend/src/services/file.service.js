@@ -41,4 +41,5 @@ export const shareFile = async (id, email) => (await API.post(`/share/${id}`, { 
 export const searchFiles = async (query) => (await API.get(`/search?query=${encodeURIComponent(query)}`)).data;
 export const getStorageStats = async () => (await API.get("/storage-stats")).data;
 export const downloadFile = async (id) => (await API.get(`/download/${id}`)).data;
+export const previewFile = async (id) => (await API.get(`/preview/${id}`, { responseType: "blob" })).data;
 export const generateShareLink = async (id, expiresInHours) => (await API.post(`/share-link/${id}`, { expiresInHours })).data;

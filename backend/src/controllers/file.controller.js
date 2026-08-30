@@ -252,6 +252,46 @@ async function downloadFile(req, res) {
   }
 }
 
+async function previewFile(req, res) {
+  try {
+    const file = await File.findOne({
+      _id: req.params.id,
+      isTrash: false,
+      $or: [
+        { user: req.user.id },
+        { "sharedWith.user": req.user.id },
+      ],
+    });
+
+    if (!file) {
+      return res.status(404).json({ success: false, message: "File not found or access denied" });
+    }
+
+    const upstream = await fetch(file.fileUrl);
+    if (!upstream.ok) {
+      throw new Error(`Storage provider returned ${upstream.status}`);
+    }
+
+    const safeFileName = file.fileName.replace(/[\r\n"\\]/g, "_");
+    const data = Buffer.from(await upstream.arrayBuffer());
+
+    // Cloud storage may mark raw PDFs as attachments. Override that header so
+    // browsers can render the response in the preview iframe.
+    res.removeHeader("X-Frame-Options");
+    res.removeHeader("Content-Security-Policy");
+    res.set({
+      "Content-Type": file.fileType || upstream.headers.get("content-type") || "application/octet-stream",
+      "Content-Disposition": `inline; filename="${safeFileName}"`,
+      "Content-Length": data.length,
+      "Cache-Control": "private, max-age=300",
+    });
+    return res.send(data);
+  } catch (error) {
+    console.error("[previewFile]", error);
+    return res.status(502).json({ success: false, message: "Unable to load file preview" });
+  }
+}
+
 async function getPublicFileByToken(req, res) {
   try {
     const file = await File.findOne({
@@ -320,6 +360,7 @@ module.exports = {
   shareFile,
   generateShareLink,
   downloadFile,
+  previewFile,
   getPublicFileByToken,
   searchFiles,
   getStorageStats,
