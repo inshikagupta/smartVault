@@ -1,9 +1,16 @@
 import axios from "axios";
 
+const apiBaseUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/$/, "");
+
 const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/auth`,
+  baseURL: apiBaseUrl
+    ? `${apiBaseUrl}/api/auth`
+    : import.meta.env.PROD
+      ? "/api/auth"
+      : "http://localhost:3000/api/auth",
   withCredentials: true,
 });
+
 
 export const registerUser = async (userData) => (await API.post("/register", userData)).data;
 export const loginUser = async (userData) => (await API.post("/login", userData)).data;
