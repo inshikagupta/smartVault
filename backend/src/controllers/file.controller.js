@@ -79,7 +79,8 @@ async function uploadFile(req, res) {
 
 async function getAllFiles(req, res) {
   try {
-    const files = await File.find({ user: req.user.id, isTrash: false }).sort({ createdAt: -1 });
+    const files = await File.find({ user: req.user.id, isTrash: false }).sort({ createdAt: -1 }).skip((page - 1) * 20)
+  .limit(20);
     res.json({ success: true, files });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -88,7 +89,8 @@ async function getAllFiles(req, res) {
 
 async function getStarredFiles(req, res) {
   try {
-    const files = await File.find({ user: req.user.id, isStarred: true, isTrash: false }).sort({ createdAt: -1 });
+    const files = await File.find({ user: req.user.id, isStarred: true, isTrash: false }).sort({ createdAt: -1 }).skip((page - 1) * 20)
+  .limit(20);
     res.json({ success: true, files });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
